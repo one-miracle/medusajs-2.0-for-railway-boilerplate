@@ -15,11 +15,6 @@
   </a>
 </p>
 
-<h2 align="center">
-  Prebaked medusajs 2.0 monorepo (backend + postgres + redis + storefront)<br>
-  <a href="https://railway.app/template/gkU-27?referralCode=-Yg50p">one-click deploy on railway!</a>
-</h2>
-
 <h1 align="center">
   Need help?<br>
   <a href="https://funkyton.com/medusajs-2-0-is-finally-here/">Step by step deploy guide, and video instructions</a>

@@ -125,17 +125,14 @@ const medusaConfig = {
     {
       resolve: `@medusajs/file-s3`,
       options: {
-        // prefix: S3_PREFIX, // optional
         s3_url: S3_URL,
         bucket: S3_BUCKET,
         region: S3_REGION,
         access_key_id: S3_ACCESS_KEY_ID,
         secret_access_key: S3_SECRET_ACCESS_KEY,
-        aws_config_object: {},
       },
     }
   ]
 };
 
-console.log(JSON.stringify(medusaConfig, null, 2));
 export default defineConfig(medusaConfig);
