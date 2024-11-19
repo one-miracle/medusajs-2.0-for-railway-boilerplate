@@ -11,11 +11,20 @@ import {
   RESEND_FROM_EMAIL,
   SENDGRID_API_KEY,
   SENDGRID_FROM_EMAIL,
+  SENDGRID_TEMPLATE_INVITATION_SENT,
+  SENDGRID_TEMPLATE_ORDER_PLACED_ID,
   SHOULD_DISABLE_ADMIN,
   STORE_CORS,
   STRIPE_API_KEY,
   STRIPE_WEBHOOK_SECRET,
-  WORKER_MODE
+  WORKER_MODE,
+  COOKIE_DOMAIN,
+  S3_URL,
+  S3_BUCKET,
+  S3_REGION,
+  S3_ACCESS_KEY_ID,
+  S3_SECRET_ACCESS_KEY,
+  S3_PREFIX,
 } from '@/lib/constants';
 
 loadEnv(process.env.NODE_ENV, process.cwd());
@@ -26,10 +35,16 @@ const medusaConfig = {
     databaseLogging: true,
     redisUrl: REDIS_URL,
     workerMode: WORKER_MODE,
+    admin_cors: ADMIN_CORS?.split(',') || [],
+    store_cors: STORE_CORS?.split(',') || [],
+    auth_cors: AUTH_CORS?.split(',') || [],
+    cookie_options: {
+      domain: COOKIE_DOMAIN || undefined,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 365 * 99, // 99 year
+    },
     http: {
-      adminCors: ADMIN_CORS,
-      authCors: AUTH_CORS,
-      storeCors: STORE_CORS,
       jwtSecret: JWT_SECRET,
       cookieSecret: COOKIE_SECRET
     }
@@ -55,7 +70,25 @@ const medusaConfig = {
         ]
       }
     },
-    ...(REDIS_URL ? [{
+    {
+      key: Modules.NOTIFICATION,
+      resolve: '@medusajs/notification',
+      options: {
+        providers: [{
+          resolve: '@medusajs/notification-sendgrid',
+          id: 'sendgrid',
+          options: {
+            channels: ['email'],
+            api_key: SENDGRID_API_KEY,
+            from: SENDGRID_FROM_EMAIL,
+            templates: {
+              staff_invitation_template: SENDGRID_TEMPLATE_INVITATION_SENT
+            }
+          }
+        }]
+      }
+    },
+    {
       key: Modules.EVENT_BUS,
       resolve: '@medusajs/event-bus-redis',
       options: {
@@ -70,34 +103,8 @@ const medusaConfig = {
           url: REDIS_URL,
         }
       }
-    }] : []),
-    ...(SENDGRID_API_KEY && SENDGRID_FROM_EMAIL || RESEND_API_KEY && RESEND_FROM_EMAIL ? [{
-      key: Modules.NOTIFICATION,
-      resolve: '@medusajs/notification',
-      options: {
-        providers: [
-          ...(SENDGRID_API_KEY && SENDGRID_FROM_EMAIL ? [{
-            resolve: '@medusajs/notification-sendgrid',
-            id: 'sendgrid',
-            options: {
-              channels: ['email'],
-              api_key: SENDGRID_API_KEY,
-              from: SENDGRID_FROM_EMAIL,
-            }
-          }] : []),
-          ...(RESEND_API_KEY && RESEND_FROM_EMAIL ? [{
-            resolve: './src/modules/email-notifications',
-            id: 'resend',
-            options: {
-              channels: ['email'],
-              api_key: RESEND_API_KEY,
-              from: RESEND_FROM_EMAIL,
-            },
-          }] : []),
-        ]
-      }
-    }] : []),
-    ...(STRIPE_API_KEY && STRIPE_WEBHOOK_SECRET ? [{
+    },
+    {
       key: Modules.PAYMENT,
       resolve: '@medusajs/payment',
       options: {
@@ -112,12 +119,23 @@ const medusaConfig = {
           },
         ],
       },
-    }] : [])
+    }
   ],
   plugins: [
-    // 'medusa-fulfillment-manual'
+    {
+      resolve: `@medusajs/file-s3`,
+      options: {
+        // prefix: S3_PREFIX, // optional
+        s3_url: S3_URL,
+        bucket: S3_BUCKET,
+        region: S3_REGION,
+        access_key_id: S3_ACCESS_KEY_ID,
+        secret_access_key: S3_SECRET_ACCESS_KEY,
+        aws_config_object: {},
+      },
+    }
   ]
 };
 
-// console.log(JSON.stringify(medusaConfig, null, 2));
+console.log(JSON.stringify(medusaConfig, null, 2));
 export default defineConfig(medusaConfig);
