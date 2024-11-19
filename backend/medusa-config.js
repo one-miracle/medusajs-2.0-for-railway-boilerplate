@@ -55,22 +55,6 @@ const medusaConfig = {
   },
   modules: [
     {
-      key: Modules.FILE,
-      resolve: '@medusajs/file',
-      options: {
-        providers: [
-          {
-            resolve: '@medusajs/file-local',
-            id: 'local',
-            options: {
-              upload_dir: 'static',
-              backend_url: `${BACKEND_URL}/static`
-            }
-          }
-        ]
-      }
-    },
-    {
       key: Modules.NOTIFICATION,
       resolve: '@medusajs/notification',
       options: {
@@ -119,19 +103,28 @@ const medusaConfig = {
           },
         ],
       },
+    },
+    {
+      key: Modules.FILE,
+      resolve: "@medusajs/medusa/file",
+      providers: [
+        {
+          resolve: "@medusajs/medusa-file-s3",
+          id: "s3",
+          options: {
+            s3_url: `https://${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com`,
+            access_key_id: S3_ACCESS_KEY_ID,
+            bucket: S3_BUCKET,
+            region: S3_REGION,
+            secret_access_key: S3_SECRET_ACCESS_KEY,
+            prefix: S3_PREFIX,
+          },
+        }
+      ]
     }
   ],
   plugins: [
-    {
-      resolve: `@medusajs/file-s3`,
-      options: {
-        s3_url: S3_URL,
-        bucket: S3_BUCKET,
-        region: S3_REGION,
-        access_key_id: S3_ACCESS_KEY_ID,
-        secret_access_key: S3_SECRET_ACCESS_KEY,
-      },
-    }
+    // Plugins
   ]
 };
 

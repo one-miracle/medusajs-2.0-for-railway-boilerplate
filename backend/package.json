@@ -23,7 +23,6 @@
     "@medusajs/admin-sdk": "latest",
     "@medusajs/cli": "latest",
     "@medusajs/core-flows": "^2.0.1",
-    "@medusajs/file-s3": "^2.0.4",
     "@medusajs/framework": "latest",
     "@medusajs/medusa": "latest",
     "@medusajs/notification-sendgrid": "latest",
