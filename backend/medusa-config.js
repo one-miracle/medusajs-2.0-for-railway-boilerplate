@@ -89,6 +89,24 @@ const medusaConfig = {
       }
     },
     {
+      key: Modules.FILE,
+      resolve: "@medusajs/file",
+      options: {
+        providers: [
+          {
+            resolve: `@medusajs/file-s3`,
+            options: {
+              s3_url: `https://${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com`,
+              bucket: process.env.S3_BUCKET,
+              region: process.env.S3_REGION,
+              access_key_id: process.env.S3_ACCESS_KEY_ID,
+              secret_access_key: process.env.S3_SECRET_ACCESS_KEY,
+            },
+          },
+        ],
+      },
+    },
+    {
       key: Modules.PAYMENT,
       resolve: '@medusajs/payment',
       options: {
@@ -104,28 +122,8 @@ const medusaConfig = {
         ],
       },
     },
-    {
-      key: Modules.FILE,
-      resolve: "@medusajs/medusa/file",
-      providers: [
-        {
-          resolve: "@medusajs/medusa-file-s3",
-          id: "s3",
-          options: {
-            s3_url: `https://${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com`,
-            access_key_id: S3_ACCESS_KEY_ID,
-            bucket: S3_BUCKET,
-            region: S3_REGION,
-            secret_access_key: S3_SECRET_ACCESS_KEY,
-            prefix: S3_PREFIX,
-          },
-        }
-      ]
-    }
   ],
-  plugins: [
-    // Plugins
-  ]
+  plugins: []
 };
 
 export default defineConfig(medusaConfig);
